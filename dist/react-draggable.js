@@ -2414,6 +2414,7 @@
 	        }, [this.props.children.props.children, React.createElement(
 	          DraggableCore,
 	          {
+	            key: 'rotateHandle',
 	            onStart: this.onRotateMouseDown,
 	            onDrag: this.onRotateMouseMove,
 	            onStop: this.onRotateMouseUp,
@@ -2422,7 +2423,6 @@
 	          React.createElement(
 	            'span',
 	            {
-	              key: 'rotateHandle',
 	              className: 'rotateHandle',
 	              style: rotateHandlerCircleStyle,
 	              hidden: this.props.disabled
