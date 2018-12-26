@@ -15,7 +15,28 @@ declare module 'react-draggable' {
     defaultClassNameDragging: string,
     defaultClassNameDragged: string,
     defaultPosition: ControlPosition,
-    position: ControlPosition
+    position: ControlPosition,
+    scale: number,
+  }
+
+  export type AdvDraggableRotateData = {
+    angle: number
+  };
+
+  export type AdvDraggableRotateEventHandler = (e: MouseEvent, data: AdvDraggableRotateData) => void;
+
+  export interface AdvDraggableProps extends DraggableCoreProps {
+    axis: 'both' | 'x' | 'y' | 'none',
+    bounds: DraggableBounds | string | false ,
+    defaultClassName: string,
+    defaultClassNameDragging: string,
+    defaultClassNameDragged: string,
+    defaultPosition: ControlPosition,
+    defaultAngle: number,
+    position: ControlPosition,
+    scale: number,
+    onRotateStart: AdvDraggableRotateEventHandler,
+    onRotateStop: AdvDraggableRotateEventHandler
   }
 
   export type DraggableEventHandler = (
@@ -55,5 +76,9 @@ declare module 'react-draggable' {
 
   export class DraggableCore extends React.Component<Partial<DraggableCoreProps>, {}> {
     static defaultProps : DraggableCoreProps;
+  }
+
+  export class AdvDraggable extends React.Component<Partial<AdvDraggableProps>, {}> {
+    static defaultProps : AdvDraggableProps;
   }
 }

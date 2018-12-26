@@ -11,144 +11,6 @@
 		return module = { exports: {} }, fn(module, module.exports), module.exports;
 	}
 
-	/**
-	 * Copyright (c) 2013-present, Facebook, Inc.
-	 *
-	 * This source code is licensed under the MIT license found in the
-	 * LICENSE file in the root directory of this source tree.
-	 *
-	 * 
-	 */
-
-	function makeEmptyFunction(arg) {
-	  return function () {
-	    return arg;
-	  };
-	}
-
-	/**
-	 * This function accepts and discards inputs; it has no side effects. This is
-	 * primarily useful idiomatically for overridable function endpoints which
-	 * always need to be callable, since JS lacks a null-call idiom ala Cocoa.
-	 */
-	var emptyFunction = function emptyFunction() {};
-
-	emptyFunction.thatReturns = makeEmptyFunction;
-	emptyFunction.thatReturnsFalse = makeEmptyFunction(false);
-	emptyFunction.thatReturnsTrue = makeEmptyFunction(true);
-	emptyFunction.thatReturnsNull = makeEmptyFunction(null);
-	emptyFunction.thatReturnsThis = function () {
-	  return this;
-	};
-	emptyFunction.thatReturnsArgument = function (arg) {
-	  return arg;
-	};
-
-	var emptyFunction_1 = emptyFunction;
-
-	/**
-	 * Copyright (c) 2013-present, Facebook, Inc.
-	 *
-	 * This source code is licensed under the MIT license found in the
-	 * LICENSE file in the root directory of this source tree.
-	 *
-	 */
-
-	/**
-	 * Use invariant() to assert state which your program assumes to be true.
-	 *
-	 * Provide sprintf-style format (only %s is supported) and arguments
-	 * to provide information about what broke and what you were
-	 * expecting.
-	 *
-	 * The invariant message will be stripped in production, but the invariant
-	 * will remain to ensure logic does not differ in production.
-	 */
-
-	var validateFormat = function validateFormat(format) {};
-
-	{
-	  validateFormat = function validateFormat(format) {
-	    if (format === undefined) {
-	      throw new Error('invariant requires an error message argument');
-	    }
-	  };
-	}
-
-	function invariant(condition, format, a, b, c, d, e, f) {
-	  validateFormat(format);
-
-	  if (!condition) {
-	    var error;
-	    if (format === undefined) {
-	      error = new Error('Minified exception occurred; use the non-minified dev environment ' + 'for the full error message and additional helpful warnings.');
-	    } else {
-	      var args = [a, b, c, d, e, f];
-	      var argIndex = 0;
-	      error = new Error(format.replace(/%s/g, function () {
-	        return args[argIndex++];
-	      }));
-	      error.name = 'Invariant Violation';
-	    }
-
-	    error.framesToPop = 1; // we don't care about invariant's own frame
-	    throw error;
-	  }
-	}
-
-	var invariant_1 = invariant;
-
-	/**
-	 * Similar to invariant but only logs a warning if the condition is not met.
-	 * This can be used to log issues in development environments in critical
-	 * paths. Removing the logging code for production environments will keep the
-	 * same logic and follow the same code paths.
-	 */
-
-	var warning = emptyFunction_1;
-
-	{
-	  var printWarning = function printWarning(format) {
-	    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-	      args[_key - 1] = arguments[_key];
-	    }
-
-	    var argIndex = 0;
-	    var message = 'Warning: ' + format.replace(/%s/g, function () {
-	      return args[argIndex++];
-	    });
-	    if (typeof console !== 'undefined') {
-	      console.error(message);
-	    }
-	    try {
-	      // --- Welcome to debugging React ---
-	      // This error was thrown as a convenience so that you can use this stack
-	      // to find the callsite that caused this warning to fire.
-	      throw new Error(message);
-	    } catch (x) {}
-	  };
-
-	  warning = function warning(condition, format) {
-	    if (format === undefined) {
-	      throw new Error('`warning(condition, format, ...args)` requires a warning ' + 'message argument');
-	    }
-
-	    if (format.indexOf('Failed Composite propType: ') === 0) {
-	      return; // Ignore CompositeComponent proptype check.
-	    }
-
-	    if (!condition) {
-	      for (var _len2 = arguments.length, args = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
-	        args[_key2 - 2] = arguments[_key2];
-	      }
-
-	      printWarning.apply(undefined, [format].concat(args));
-	    }
-	  };
-	}
-
-	var warning_1 = warning;
-
 	/*
 	object-assign
 	(c) Sindre Sorhus
@@ -249,11 +111,24 @@
 
 	var ReactPropTypesSecret_1 = ReactPropTypesSecret;
 
+	var printWarning = function() {};
+
 	{
-	  var invariant$1 = invariant_1;
-	  var warning$1 = warning_1;
 	  var ReactPropTypesSecret$1 = ReactPropTypesSecret_1;
 	  var loggedTypeFailures = {};
+
+	  printWarning = function(text) {
+	    var message = 'Warning: ' + text;
+	    if (typeof console !== 'undefined') {
+	      console.error(message);
+	    }
+	    try {
+	      // --- Welcome to debugging React ---
+	      // This error was thrown as a convenience so that you can use this stack
+	      // to find the callsite that caused this warning to fire.
+	      throw new Error(message);
+	    } catch (x) {}
+	  };
 	}
 
 	/**
@@ -278,12 +153,29 @@
 	        try {
 	          // This is intentionally an invariant that gets caught. It's the same
 	          // behavior as without this statement except with a better message.
-	          invariant$1(typeof typeSpecs[typeSpecName] === 'function', '%s: %s type `%s` is invalid; it must be a function, usually from ' + 'the `prop-types` package, but received `%s`.', componentName || 'React class', location, typeSpecName, typeof typeSpecs[typeSpecName]);
+	          if (typeof typeSpecs[typeSpecName] !== 'function') {
+	            var err = Error(
+	              (componentName || 'React class') + ': ' + location + ' type `' + typeSpecName + '` is invalid; ' +
+	              'it must be a function, usually from the `prop-types` package, but received `' + typeof typeSpecs[typeSpecName] + '`.'
+	            );
+	            err.name = 'Invariant Violation';
+	            throw err;
+	          }
 	          error = typeSpecs[typeSpecName](values, typeSpecName, componentName, location, null, ReactPropTypesSecret$1);
 	        } catch (ex) {
 	          error = ex;
 	        }
-	        warning$1(!error || error instanceof Error, '%s: type specification of %s `%s` is invalid; the type checker ' + 'function must return `null` or an `Error` but returned a %s. ' + 'You may have forgotten to pass an argument to the type checker ' + 'creator (arrayOf, instanceOf, objectOf, oneOf, oneOfType, and ' + 'shape all require an argument).', componentName || 'React class', location, typeSpecName, typeof error);
+	        if (error && !(error instanceof Error)) {
+	          printWarning(
+	            (componentName || 'React class') + ': type specification of ' +
+	            location + ' `' + typeSpecName + '` is invalid; the type checker ' +
+	            'function must return `null` or an `Error` but returned a ' + typeof error + '. ' +
+	            'You may have forgotten to pass an argument to the type checker ' +
+	            'creator (arrayOf, instanceOf, objectOf, oneOf, oneOfType, and ' +
+	            'shape all require an argument).'
+	          );
+
+	        }
 	        if (error instanceof Error && !(error.message in loggedTypeFailures)) {
 	          // Only monitor this failure once because there tends to be a lot of the
 	          // same error.
@@ -291,7 +183,9 @@
 
 	          var stack = getStack ? getStack() : '';
 
-	          warning$1(false, 'Failed %s type: %s%s', location, error.message, stack != null ? stack : '');
+	          printWarning(
+	            'Failed ' + location + ' type: ' + error.message + (stack != null ? stack : '')
+	          );
 	        }
 	      }
 	    }
@@ -299,6 +193,27 @@
 	}
 
 	var checkPropTypes_1 = checkPropTypes;
+
+	var printWarning$1 = function() {};
+
+	{
+	  printWarning$1 = function(text) {
+	    var message = 'Warning: ' + text;
+	    if (typeof console !== 'undefined') {
+	      console.error(message);
+	    }
+	    try {
+	      // --- Welcome to debugging React ---
+	      // This error was thrown as a convenience so that you can use this stack
+	      // to find the callsite that caused this warning to fire.
+	      throw new Error(message);
+	    } catch (x) {}
+	  };
+	}
+
+	function emptyFunctionThatReturnsNull() {
+	  return null;
+	}
 
 	var factoryWithTypeCheckers = function(isValidElement, throwOnDirectAccess) {
 	  /* global Symbol */
@@ -442,12 +357,13 @@
 	      if (secret !== ReactPropTypesSecret_1) {
 	        if (throwOnDirectAccess) {
 	          // New behavior only for users of `prop-types` package
-	          invariant_1(
-	            false,
+	          var err = new Error(
 	            'Calling PropTypes validators directly is not supported by the `prop-types` package. ' +
 	            'Use `PropTypes.checkPropTypes()` to call them. ' +
 	            'Read more at http://fb.me/use-check-prop-types'
 	          );
+	          err.name = 'Invariant Violation';
+	          throw err;
 	        } else if ("development" !== 'production' && typeof console !== 'undefined') {
 	          // Old behavior for people using React.PropTypes
 	          var cacheKey = componentName + ':' + propName;
@@ -456,15 +372,12 @@
 	            // Avoid spamming the console because they are often not actionable except for lib authors
 	            manualPropTypeWarningCount < 3
 	          ) {
-	            warning_1(
-	              false,
+	            printWarning$1(
 	              'You are manually calling a React.PropTypes validation ' +
-	              'function for the `%s` prop on `%s`. This is deprecated ' +
+	              'function for the `' + propFullName + '` prop on `' + componentName  + '`. This is deprecated ' +
 	              'and will throw in the standalone `prop-types` package. ' +
 	              'You may be seeing this warning due to a third-party PropTypes ' +
-	              'library. See https://fb.me/react-warning-dont-call-proptypes ' + 'for details.',
-	              propFullName,
-	              componentName
+	              'library. See https://fb.me/react-warning-dont-call-proptypes ' + 'for details.'
 	            );
 	            manualPropTypeCallCache[cacheKey] = true;
 	            manualPropTypeWarningCount++;
@@ -508,7 +421,7 @@
 	  }
 
 	  function createAnyTypeChecker() {
-	    return createChainableTypeChecker(emptyFunction_1.thatReturnsNull);
+	    return createChainableTypeChecker(emptyFunctionThatReturnsNull);
 	  }
 
 	  function createArrayOfTypeChecker(typeChecker) {
@@ -558,8 +471,8 @@
 
 	  function createEnumTypeChecker(expectedValues) {
 	    if (!Array.isArray(expectedValues)) {
-	      warning_1(false, 'Invalid argument supplied to oneOf, expected an instance of array.');
-	      return emptyFunction_1.thatReturnsNull;
+	      printWarning$1('Invalid argument supplied to oneOf, expected an instance of array.');
+	      return emptyFunctionThatReturnsNull;
 	    }
 
 	    function validate(props, propName, componentName, location, propFullName) {
@@ -601,21 +514,18 @@
 
 	  function createUnionTypeChecker(arrayOfTypeCheckers) {
 	    if (!Array.isArray(arrayOfTypeCheckers)) {
-	      warning_1(false, 'Invalid argument supplied to oneOfType, expected an instance of array.');
-	      return emptyFunction_1.thatReturnsNull;
+	      printWarning$1('Invalid argument supplied to oneOfType, expected an instance of array.');
+	      return emptyFunctionThatReturnsNull;
 	    }
 
 	    for (var i = 0; i < arrayOfTypeCheckers.length; i++) {
 	      var checker = arrayOfTypeCheckers[i];
 	      if (typeof checker !== 'function') {
-	        warning_1(
-	          false,
+	        printWarning$1(
 	          'Invalid argument supplied to oneOfType. Expected an array of check functions, but ' +
-	          'received %s at index %s.',
-	          getPostfixForTypeWarning(checker),
-	          i
+	          'received ' + getPostfixForTypeWarning(checker) + ' at index ' + i + '.'
 	        );
-	        return emptyFunction_1.thatReturnsNull;
+	        return emptyFunctionThatReturnsNull;
 	      }
 	    }
 
@@ -855,7 +765,7 @@
 
 	var classnames = createCommonjsModule(function (module) {
 	/*!
-	  Copyright (c) 2016 Jed Watson.
+	  Copyright (c) 2017 Jed Watson.
 	  Licensed under the MIT License (MIT), see
 	  http://jedwatson.github.io/classnames
 	*/
@@ -876,8 +786,11 @@
 
 				if (argType === 'string' || argType === 'number') {
 					classes.push(arg);
-				} else if (Array.isArray(arg)) {
-					classes.push(classNames.apply(null, arg));
+				} else if (Array.isArray(arg) && arg.length) {
+					var inner = classNames.apply(null, arg);
+					if (inner) {
+						classes.push(inner);
+					}
 				} else if (argType === 'object') {
 					for (var key in arg) {
 						if (hasOwn.call(arg, key) && arg[key]) {
@@ -891,6 +804,7 @@
 		}
 
 		if ('object' !== 'undefined' && module.exports) {
+			classNames.default = classNames;
 			module.exports = classNames;
 		} else if (typeof undefined === 'function' && typeof undefined.amd === 'object' && undefined.amd) {
 			// register as 'classnames', consistent with npm package name
@@ -1196,10 +1110,11 @@
 
 	function createCSSTransform(_ref) /*: Object*/ {
 	  var x = _ref.x,
-	      y = _ref.y;
+	      y = _ref.y,
+	      angle = _ref.angle;
 
 	  // Replace unitless items with px
-	  return defineProperty({}, browserPrefixToKey('transform', browserPrefix), 'translate(' + x + 'px,' + y + 'px)');
+	  return defineProperty({}, browserPrefixToKey('transform', browserPrefix), 'translate(' + x + 'px,' + y + 'px) ' + 'rotate(' + angle + 'deg)');
 	}
 
 	function createSVGTransform(_ref3) /*: string*/ {
@@ -2191,12 +2106,383 @@
 	  scale: 1
 	});
 
+	/*:: import type {DraggableEventHandler} from './utils/types';*/
+	/*:: import type {Element as ReactElement} from 'react';*/
+	/*:: type AdvDraggableState = {
+	  dragging: boolean,
+	  dragged: boolean,
+	  x: number, y: number,
+	  slackX: number, slackY: number,
+	  isElementSVG: boolean,
+	  angle: number,
+	  rotating: boolean,
+	  rotated: boolean,
+	};*/
+	/*:: export type AdvDraggableRotateData = {
+	  angle: number
+	};*/
+	/*:: export type AdvDraggableRotateEventHandler = (e: MouseEvent, data: AdvDraggableRotateData) => void;*/
+	/*:: export type AdvDraggableProps = {
+	  ...$Exact<DraggableCoreProps>,
+	  axis: 'both' | 'x' | 'y' | 'none',
+	  bounds: DraggableBounds | string | false,
+	  defaultClassName: string,
+	  defaultClassNameDragging: string,
+	  defaultClassNameDragged: string,
+	  defaultPosition: ControlPosition,
+	  defaultAngle: number,
+	  position: ControlPosition,
+	  scale: number,
+	  onRotateStart: AdvDraggableRotateEventHandler,
+	  onRotateStop: AdvDraggableRotateEventHandler
+	};*/
+
+	var AdvDraggable = function (_React$Component) {
+	  inherits(AdvDraggable, _React$Component);
+
+	  function AdvDraggable(props /*: AdvDraggableProps*/) {
+	    classCallCheck(this, AdvDraggable);
+
+	    var _this = possibleConstructorReturn(this, (AdvDraggable.__proto__ || Object.getPrototypeOf(AdvDraggable)).call(this, props));
+
+	    _this.onRotateMouseDown = function (e) {
+	      _this.props.onRotateStart(e, { angle: _this.state.angle });
+	      _this.setState({ rotating: true, rotated: true });
+	    };
+
+	    _this.onRotateMouseUp = function (e) {
+
+	      if (!_this.state.rotating) return false;
+	      _this.props.onRotateStop(e, { angle: _this.state.angle });
+	      _this.setState({ rotating: false });
+	    };
+
+	    _this.onRotateMouseMove = function (e /*: MouseEvent*/) {
+
+	      if (!_this.state.rotating) return false;
+
+	      var x = e.pageX;
+	      var y = e.pageY;
+
+	      var _ReactDOM$findDOMNode = ReactDOM.findDOMNode(_this).getBoundingClientRect(),
+	          left = _ReactDOM$findDOMNode.left,
+	          top = _ReactDOM$findDOMNode.top,
+	          width = _ReactDOM$findDOMNode.width,
+	          height = _ReactDOM$findDOMNode.height;
+
+	      var centerX = left + width / 2;
+	      var centerY = top + height / 2;
+	      var angle = _this.getAngle(centerX, centerY, x, y);
+
+	      var mod = angle % 90;
+	      if (Math.abs(mod) < 2) {
+	        angle -= mod;
+	      } else {
+	        if (mod >= 88 && mod <= 90) {
+	          angle += 90 - mod;
+	        } else {
+	          if (mod >= -90 && mod <= -88) {
+	            angle -= 90 + mod;
+	          }
+	        }
+	      }
+
+	      _this.setState({ angle: angle });
+	    };
+
+	    _this.getAngle = function (centerX, centerY, pageX, pageY) /*: number*/ {
+	      var x = Math.abs(centerX - pageX);
+	      var y = Math.abs(centerY - pageY);
+	      var z = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+	      var cos = y / z;
+	      var radian = Math.acos(cos);
+	      var angle = Math.floor(180 / (Math.PI / radian));
+	      if (pageX > centerX && pageY > centerY) {
+	        angle = 180 - angle;
+	      }
+	      if (pageX == centerX && pageY > centerY) {
+	        angle = 180;
+	      }
+	      if (pageX > centerX && pageY == centerY) {
+	        angle = 90;
+	      }
+	      if (pageX < centerX && pageY > centerY) {
+	        angle = 180 + angle;
+	      }
+	      if (pageX < centerX && pageY == centerY) {
+	        angle = 270;
+	      }
+	      if (pageX < centerX && pageY < centerY) {
+	        angle = 360 - angle;
+	      }
+	      angle %= 360;
+	      angle = angle > 180 ? angle % 180 - 180 : angle;
+	      return angle;
+	    };
+
+	    _this.onDragStart = function (e, coreData) {
+
+	      var shouldStart = _this.props.onStart(e, createDraggableData(_this, coreData));
+	      if (shouldStart === false) return false;
+
+	      _this.setState({ dragging: true, dragged: true });
+	    };
+
+	    _this.onDrag = function (e, coreData) {
+	      if (!_this.state.dragging) return false;
+
+	      var uiData = createDraggableData(_this, coreData);
+
+	      var newState /*: $Shape<AdvDraggableState>*/ = {
+	        x: uiData.x,
+	        y: uiData.y
+	      };
+
+	      if (_this.props.bounds) {
+	        var _x = newState.x,
+	            _y = newState.y;
+
+
+	        newState.x += _this.state.slackX;
+	        newState.y += _this.state.slackY;
+
+	        var _getBoundPosition = getBoundPosition(_this, newState.x, newState.y),
+	            _getBoundPosition2 = slicedToArray(_getBoundPosition, 2),
+	            newStateX = _getBoundPosition2[0],
+	            newStateY = _getBoundPosition2[1];
+
+	        newState.x = newStateX;
+	        newState.y = newStateY;
+
+	        newState.slackX = _this.state.slackX + (_x - newState.x);
+	        newState.slackY = _this.state.slackY + (_y - newState.y);
+
+	        uiData.x = newState.x;
+	        uiData.y = newState.y;
+	        uiData.deltaX = newState.x - _this.state.x;
+	        uiData.deltaY = newState.y - _this.state.y;
+	      }
+
+	      var shouldUpdate = _this.props.onDrag(e, uiData);
+	      if (shouldUpdate === false) return false;
+
+	      _this.setState(newState);
+	    };
+
+	    _this.onDragStop = function (e, coreData) {
+	      if (!_this.state.dragging) return false;
+
+	      var shouldStop = _this.props.onStop(e, createDraggableData(_this, coreData));
+	      if (shouldStop === false) return false;
+
+	      var newState /*: $Shape<AdvDraggableState>*/ = {
+	        dragging: false,
+	        slackX: 0,
+	        slackY: 0
+	      };
+
+	      var controlled = Boolean(_this.props.position);
+	      if (controlled) {
+	        var _this$props$position = _this.props.position,
+	            _x2 = _this$props$position.x,
+	            _y2 = _this$props$position.y;
+
+	        newState.x = _x2;
+	        newState.y = _y2;
+	      }
+
+	      _this.setState(newState);
+	    };
+
+	    _this.state = {
+	      dragging: false,
+	      dragged: false,
+
+	      x: props.position ? props.position.x : props.defaultPosition.x,
+	      y: props.position ? props.position.y : props.defaultPosition.y,
+
+	      slackX: 0, slackY: 0,
+
+	      isElementSVG: false,
+
+	      angle: props.defaultAngle,
+	      rotating: false,
+	      rotated: false
+	    };
+	    return _this;
+	  }
+
+	  createClass(AdvDraggable, [{
+	    key: 'componentWillMount',
+	    value: function componentWillMount() {
+	      if (this.props.position && !(this.props.onDrag || this.props.onStop)) {
+	        // eslint-disable-next-line
+	        console.warn('A `position` was applied to this <AdvDraggable>, without drag handlers. This will make this ' + 'component effectively undraggable. Please attach `onDrag` or `onStop` handlers so you can adjust the ' + '`position` of this element.');
+	      }
+	    }
+	  }, {
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      if (typeof window.SVGElement !== 'undefined' && ReactDOM.findDOMNode(this) instanceof window.SVGElement) {
+	        this.setState({ isElementSVG: true });
+	      }
+	    }
+	  }, {
+	    key: 'componentWillReceiveProps',
+	    value: function componentWillReceiveProps(nextProps /*: Object*/) {
+	      if (nextProps.position && (!this.props.position || nextProps.position.x !== this.props.position.x || nextProps.position.y !== this.props.position.y)) {
+	        this.setState({ x: nextProps.position.x, y: nextProps.position.y });
+	      }
+	    }
+	  }, {
+	    key: 'componentWillUnmount',
+	    value: function componentWillUnmount() {
+	      this.setState({ dragging: false });
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() /*: ReactElement<any>*/ {
+	      var _classNames;
+
+	      var style = {},
+	          svgTransform = null;
+
+	      var controlled = Boolean(this.props.position);
+	      var draggable = !controlled || this.state.dragging;
+
+	      var position = this.props.position || this.props.defaultPosition;
+	      var transformOpts = {
+	        x: canDragX(this) && draggable ? this.state.x : position.x,
+
+	        y: canDragY(this) && draggable ? this.state.y : position.y,
+
+	        angle: this.state.angle
+	      };
+
+	      if (this.state.isElementSVG) {
+	        svgTransform = createSVGTransform(transformOpts);
+	      } else {
+	        style = createCSSTransform(transformOpts);
+	      }
+
+	      var _props = this.props,
+	          defaultClassName = _props.defaultClassName,
+	          defaultClassNameDragging = _props.defaultClassNameDragging,
+	          defaultClassNameDragged = _props.defaultClassNameDragged;
+
+
+	      var children = React.Children.only(this.props.children);
+
+	      var className = classnames(children.props.className || '', defaultClassName, (_classNames = {}, defineProperty(_classNames, defaultClassNameDragging, this.state.dragging), defineProperty(_classNames, defaultClassNameDragged, this.state.dragged), _classNames));
+
+	      var rotateHandlerCircleStyle = {
+	        position: 'absolute',
+	        left: '50%',
+	        marginLeft: '-5px',
+	        top: '-20px',
+	        width: '10px',
+	        height: '10px',
+	        background: '#666',
+	        borderRadius: '100%',
+	        cursor: 'grab'
+	      };
+
+	      var rotateHandlerLineStyle = {
+	        position: 'absolute',
+	        left: '50%',
+	        top: '10px',
+	        width: '1px',
+	        height: '10px',
+	        background: '#666'
+	      };
+
+	      return React.createElement(
+	        DraggableCore,
+	        _extends({}, this.props, {
+	          onStart: this.onDragStart,
+	          onDrag: this.onDrag,
+	          onStop: this.onDragStop
+	        }),
+	        React.cloneElement(children, {
+	          className: className,
+	          style: _extends({}, children.props.style, style),
+	          transform: svgTransform
+	        }, [this.props.children.props.children, React.createElement(
+	          DraggableCore,
+	          {
+	            onStart: this.onRotateMouseDown,
+	            onDrag: this.onRotateMouseMove,
+	            onStop: this.onRotateMouseUp,
+	            handle: '.rotateHandle'
+	          },
+	          React.createElement(
+	            'span',
+	            {
+	              key: 'rotateHandle',
+	              className: 'rotateHandle',
+	              style: rotateHandlerCircleStyle,
+	              hidden: this.props.disabled
+	            },
+	            React.createElement('span', { style: rotateHandlerLineStyle })
+	          )
+	        )])
+	      );
+	    }
+	  }]);
+	  return AdvDraggable;
+	}(React.Component);
+
+	AdvDraggable.displayName = 'AdvDraggable';
+	AdvDraggable.propTypes = _extends({}, DraggableCore.propTypes, {
+	  axis: propTypes.oneOf(['both', 'x', 'y', 'none']),
+	  bounds: propTypes.oneOfType([propTypes.shape({
+	    left: propTypes.number,
+	    right: propTypes.number,
+	    top: propTypes.number,
+	    bottom: propTypes.number
+	  }), propTypes.string, propTypes.oneOf([false])]),
+
+	  defaultClassName: propTypes.string,
+	  defaultClassNameDragging: propTypes.string,
+	  defaultClassNameDragged: propTypes.string,
+	  defaultPosition: propTypes.shape({
+	    x: propTypes.number,
+	    y: propTypes.number
+	  }),
+	  defaultAngle: propTypes.number,
+	  position: propTypes.shape({
+	    x: propTypes.number,
+	    y: propTypes.number
+	  }),
+	  className: dontSetMe,
+	  style: dontSetMe,
+	  transform: dontSetMe,
+	  scale: propTypes.number,
+	  onRotateStart: propTypes.func,
+	  onRotateStop: propTypes.func
+	});
+	AdvDraggable.defaultProps = _extends({}, DraggableCore.defaultProps, {
+	  axis: 'both',
+	  bounds: false,
+	  defaultClassName: 'react-draggable',
+	  defaultClassNameDragging: 'react-draggable-dragging',
+	  defaultClassNameDragged: 'react-draggable-dragged',
+	  defaultPosition: { x: 0, y: 0 },
+	  defaultAngle: 0,
+	  position: null,
+	  scale: 1,
+	  onRotateStart: function onRotateStart() {},
+	  onRotateStop: function onRotateStop() {}
+
+	});
+
 	// Previous versions of this lib exported <Draggable> as the root export. As to not break
 	// them, or TypeScript, we export *both* as the root and as 'default'.
 	// See https://github.com/mzabriskie/react-draggable/pull/254
 	// and https://github.com/mzabriskie/react-draggable/issues/266
 	Draggable.default = Draggable;
 	Draggable.DraggableCore = DraggableCore;
+	Draggable.AdvDraggable = AdvDraggable;
 
 	return Draggable;
 
