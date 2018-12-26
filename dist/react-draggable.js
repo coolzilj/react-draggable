@@ -2333,6 +2333,10 @@
 	      if (nextProps.position && (!this.props.position || nextProps.position.x !== this.props.position.x || nextProps.position.y !== this.props.position.y)) {
 	        this.setState({ x: nextProps.position.x, y: nextProps.position.y });
 	      }
+
+	      if (nextProps.defaultAngle !== this.props.defaultAngle) {
+	        this.setState({ angle: nextProps.defaultAngle });
+	      }
 	    }
 	  }, {
 	    key: 'componentWillUnmount',

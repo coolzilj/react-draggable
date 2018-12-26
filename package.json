@@ -82,10 +82,7 @@
     "webpack": "^3.8.1",
     "webpack-dev-server": "^2.9.5"
   },
-  "precommit": [
-    "lint",
-    "test"
-  ],
+  "precommit": [],
   "dependencies": {
     "classnames": "^2.2.5",
     "prop-types": "^15.6.0"
