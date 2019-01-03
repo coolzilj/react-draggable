@@ -1,4 +1,6 @@
 var webpack = require('webpack');
+const ShellPlugin = require('webpack-shell-plugin');
+const postBuildScript = process.env.YALC === 'true' ? 'npx yalc push' : 'true';
 
 module.exports = {
 	entry: './index.js',
@@ -44,5 +46,6 @@ module.exports = {
     }),
     // Scope hoisting
     new webpack.optimize.ModuleConcatenationPlugin(),
+    new ShellPlugin({ onBuildExit: postBuildScript }),
   ]
 };
