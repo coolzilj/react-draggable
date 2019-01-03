@@ -1,6 +1,6 @@
 var webpack = require('webpack');
 const ShellPlugin = require('webpack-shell-plugin');
-const postBuildScript = process.env.YALC === 'true' ? 'npx yalc push' : 'true';
+const postBuildScript = process.env.YALC === 'true' ? 'npx yalc push --changed' : 'true';
 
 module.exports = {
 	entry: './index.js',
