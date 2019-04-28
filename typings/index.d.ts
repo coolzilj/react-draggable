@@ -19,25 +19,25 @@ declare module 'react-draggable' {
     scale: number,
   }
 
-  export type AdvDraggableRotateData = {
-    angle: number
-  };
+  // export type AdvDraggableRotateData = {
+  //   angle: number
+  // };
 
-  export type AdvDraggableRotateEventHandler = (e: MouseEvent, data: AdvDraggableRotateData) => void;
+  // export type AdvDraggableRotateEventHandler = (e: MouseEvent, data: AdvDraggableRotateData) => void;
 
-  export interface AdvDraggableProps extends DraggableCoreProps {
-    axis: 'both' | 'x' | 'y' | 'none',
-    bounds: DraggableBounds | string | false ,
-    defaultClassName: string,
-    defaultClassNameDragging: string,
-    defaultClassNameDragged: string,
-    defaultPosition: ControlPosition,
-    defaultAngle: number,
-    position: ControlPosition,
-    scale: number,
-    onRotateStart: AdvDraggableRotateEventHandler,
-    onRotateStop: AdvDraggableRotateEventHandler
-  }
+  // export interface AdvDraggableProps extends DraggableCoreProps {
+  //   axis: 'both' | 'x' | 'y' | 'none',
+  //   bounds: DraggableBounds | string | false ,
+  //   defaultClassName: string,
+  //   defaultClassNameDragging: string,
+  //   defaultClassNameDragged: string,
+  //   defaultPosition: ControlPosition,
+  //   defaultAngle: number,
+  //   position: ControlPosition,
+  //   scale: number,
+  //   onRotateStart: AdvDraggableRotateEventHandler,
+  //   onRotateStop: AdvDraggableRotateEventHandler
+  // }
 
   export type DraggableEventHandler = (
     e: React.MouseEvent<HTMLElement | SVGElement>
@@ -45,7 +45,7 @@ declare module 'react-draggable' {
      | MouseEvent
      | TouchEvent,
     data: DraggableData
-  ) => void | false;
+  ) => void | boolean;
 
   export interface DraggableData {
     node: HTMLElement,
@@ -78,7 +78,16 @@ declare module 'react-draggable' {
     static defaultProps : DraggableCoreProps;
   }
 
-  export class AdvDraggable extends React.Component<Partial<AdvDraggableProps>, {}> {
-    static defaultProps : AdvDraggableProps;
-  }
+  // export class AdvDraggable extends React.Component<Partial<AdvDraggableProps>, {}> {
+  //   static defaultProps : AdvDraggableProps;
+  // }
+
+  // utils
+  export function createCSSTransform({x, y, angle}: {x: number, y: number, angle: number}): Object
+  export function createSVGTransform({x, y}: {x: number, y: number}): string
+  export function canDragX(draggable: Draggable): boolean 
+  export function canDragY(draggable: Draggable): boolean
+  export function createDraggableData(draggable: Draggable, coreData: DraggableData): DraggableData
+  export function getBoundPosition(draggable: Draggable, x: number, y: number): [number, number] 
+  export function dontSetMe(props: Object, propName: string, componentName: string): any
 }
